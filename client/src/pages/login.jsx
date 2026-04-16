@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { userContext } from "../context/userContext";
+import api from "../axios-api/axios";
 
 const Login = () => {
   const [isLogin, setIslogin] = useState("login");
@@ -13,7 +14,7 @@ const Login = () => {
     email: "",
     password: "",
   });
-  const { setIsAuthenticated, getUserData } = useContext(userContext);
+  const { getUserData } = useContext(userContext);
   const navigate = useNavigate();
 
   function handleChange(e) {
@@ -22,7 +23,6 @@ const Login = () => {
     // console.log(formData);
   }
   async function handleSubmit(e) {
-    axios.defaults.withCredentials = true;
     e.preventDefault();
     setLoading(true);
     try {
@@ -30,24 +30,18 @@ const Login = () => {
         const { email, password } = formData;
 
         console.log("loginData", email, password);
-        const { data } = await axios.post(
-          "http://localhost:4000/api/auth/login",
-          {
-            email,
-            password,
-          },
-        );
+        const { data } = await api.post("/api/auth/login", {
+          email,
+          password,
+        });
         console.log(data);
         getUserData();
-        setIsAuthenticated(true);
+        // setIsAuthenticated(true);
         navigate("/");
 
         toast.success(data.message);
       } else {
-        const { data } = await axios.post(
-          "http://localhost:4000/api/auth/register",
-          formData,
-        );
+        const { data } = await api.post("/api/auth/register", formData);
         setIslogin("login");
 
         toast.success(data.message);
@@ -62,13 +56,8 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gray-400">
       {" "}
-      <header className="py-4 px-10 bg-gray-800 text-white flex items-center justify-between md:px-16">
-        <h1 className="text-2xl font-bold">
-          ACCOUNTS&<span className="text-amber-400">PARTNERS</span>
-        </h1>
-      </header>
-      <div className="flex justify-center px-5 py-20">
-        <div className="w-full p-10 rounded-lg flex-col space-y-8 items-center bg-slate-900 md:w-[30%]">
+      <div className="flex justify-center px-10 py-20">
+        <div className="w-full p-8 rounded-lg flex-col space-y-8 items-center bg-slate-900 md:p-10 md:w-[50%] lg:w-[30%]">
           <div className="flex flex-col items-center gap-2">
             <h1 className="font-bold text-2xl max-w-full">
               {isLogin === "login" ? "Login" : "Create account"}
@@ -99,7 +88,7 @@ const Login = () => {
               className="outline-none bg-slate-700 rounded-full w-full px-3 py-1"
             />
             <input
-              type="text"
+              type="password"
               placeholder="password"
               value={formData.password}
               name="password"

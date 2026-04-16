@@ -1,18 +1,34 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { userContext } from "../context/userContext";
-import axios from "axios";
+import api from "../axios-api/axios";
+import { toast } from "react-toastify";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, setIsAuthenticated, user } = useContext(userContext);
+  const { isAuthenticated, user, getUserData } = useContext(userContext);
   async function handleLogout() {
     try {
-      await axios.post("http://localhost:4000/api/auth/logout");
-      setIsAuthenticated(false);
+      await api.post("/api/auth/logout");
+      // setIsAuthenticated(false);
+      setUser(null);
       navigate("/login");
     } catch (err) {
       console.error("Logout failed:", err);
+    }
+  }
+
+  async function handleVerification() {
+    try {
+      const res = await api.post("/api/auth/verify");
+      getUserData();
+      if (res.status === 200) {
+        navigate("/");
+        toast.success(res.data.message);
+      }
+      return res.data.message;
+    } catch (err) {
+      console.error("Verification failed:", err);
     }
   }
 
@@ -31,7 +47,9 @@ const Header = () => {
               <li onClick={handleLogout} className="cursor-pointer">
                 Logout
               </li>
-              {!user?.isVerified && <li>Verify</li>}
+              {!user?.isVerified && (
+                <li onClick={handleVerification}>Verify</li>
+              )}
             </ul>
           </div>
         ) : (
