@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useOtp } from "../utils/otpLogic";
 import api from "../axios-api/axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const ResetPassword = () => {
   const [otp, setOtp] = useState("");
@@ -9,6 +10,7 @@ const ResetPassword = () => {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const { handleInput, handleKeyDown, inputRefs, handlePaste } = useOtp();
 
@@ -55,6 +57,7 @@ const ResetPassword = () => {
       });
       if (res.status === 200) {
         toast.success(res.data.message);
+        navigate("/login");
       } else {
         toast.error(res.data.message);
       }
