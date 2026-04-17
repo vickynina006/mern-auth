@@ -1,6 +1,5 @@
 import { useState, useContext } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { userContext } from "../context/userContext";
@@ -29,12 +28,12 @@ const Login = () => {
       if (isLogin === "login") {
         const { email, password } = formData;
 
-        console.log("loginData", email, password);
+        // console.log("loginData", email, password);
         const { data } = await api.post("/api/auth/login", {
           email,
           password,
         });
-        console.log(data);
+        // console.log(data);
         getUserData();
         // setIsAuthenticated(true);
         navigate("/");

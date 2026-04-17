@@ -20,10 +20,10 @@ const Header = () => {
 
   async function handleVerification() {
     try {
-      const res = await api.post("/api/auth/verify");
+      const res = await api.post("/api/auth/send-verify-otp");
       getUserData();
       if (res.status === 200) {
-        navigate("/");
+        navigate("/verify-email");
         toast.success(res.data.message);
       }
       return res.data.message;
@@ -48,7 +48,9 @@ const Header = () => {
                 Logout
               </li>
               {!user?.isVerified && (
-                <li onClick={handleVerification}>Verify</li>
+                <li onClick={handleVerification} className="cursor-pointer">
+                  Verify
+                </li>
               )}
             </ul>
           </div>
