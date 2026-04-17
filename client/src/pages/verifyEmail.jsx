@@ -31,45 +31,40 @@ const VerifyEmail = () => {
     }
   }
   return (
-    <div className="min-h-screen bg-gray-400">
+    <div className="min-h-screen bg-gray-400 flex justify-center px-2 smx:px-8 md:px-0">
       {" "}
-      <div className="flex justify-center px-10 py-20">
-        <div className="w-full p-8 rounded-lg flex-col space-y-8 items-center bg-slate-900 md:p-10 md:w-[50%] lg:w-[30%]">
-          <div className="flex flex-col items-center gap-2">
-            <h1 className="font-bold text-2xl max-w-full">
-              Email Verification
-            </h1>
-            <p className="text-center text-slate-300">
-              Please verify your email address to continue.
-            </p>
-          </div>
-          <form onSubmit={handleSubmit} className="gap-5 flex flex-col w-full">
-            <div
-              className="flex justify-center gap-2 w-full"
-              onPaste={handlePaste}
-            >
-              {Array(6)
-                .fill(0)
-                .map((_, i) => (
-                  <input
-                    key={i}
-                    type="text"
-                    maxLength={1}
-                    ref={(el) => (inputRefs.current[i] = el)}
-                    required
-                    onKeyDown={(e) => handleKeyDown(e, i)}
-                    onInput={(e) => handleInput(e, i)}
-                    className=" bg-slate-700 rounded-sm w-5 h-5 text-center sm:w-7 sm:h-7 md:w-10 md:h-10"
-                  />
-                ))}
-            </div>
-
-            <button className="bg-linear-to-r from-amber-500 to-amber-700 text-white py-1.5 px-8 rounded-full">
-              Verify email
-            </button>
-          </form>
+      <form
+        onSubmit={handleSubmit}
+        className="p-8 rounded-lg h-fit mt-44 flex-col space-y-8 items-center bg-slate-900 md:mt-40 md:p-10 md:w-[43%] lg:w-[34%] xl:w-[25%]"
+      >
+        <div className="flex flex-col items-center gap-2">
+          <h1 className="font-bold text-2xl max-w-full">Email Verification</h1>
+          <p className="text-center text-slate-300">
+            Please verify your email address to continue.
+          </p>
         </div>
-      </div>
+
+        <div className="flex justify-center gap-2 w-full" onPaste={handlePaste}>
+          {Array(6)
+            .fill(0)
+            .map((_, i) => (
+              <input
+                key={i}
+                type="text"
+                maxLength={1}
+                ref={(el) => (inputRefs.current[i] = el)}
+                required
+                onKeyDown={(e) => handleKeyDown(e, i)}
+                onInput={(e) => handleInput(e, i)}
+                className="bg-slate-700 rounded-sm w-6 h-6 text-center smx:w-7 smx:h-7 md:w-8 md:h-8"
+              />
+            ))}
+        </div>
+
+        <button className="bg-linear-to-r w-full from-amber-500 to-amber-700 text-white py-1.5 px-8 rounded-full">
+          Verify email
+        </button>
+      </form>
     </div>
 
     // <OtpForm
