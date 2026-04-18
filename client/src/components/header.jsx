@@ -20,13 +20,13 @@ const Header = () => {
 
   async function handleVerification() {
     try {
+      navigate("/verify-email");
       const res = await api.post("/api/auth/send-verify-otp");
       getUserData();
       if (res.status === 200) {
-        navigate("/verify-email");
         toast.success(res.data.message);
       }
-      return res.data.message;
+      return toast.error(res.data.message);
     } catch (err) {
       console.error("Verification failed:", err);
     }
@@ -34,7 +34,7 @@ const Header = () => {
 
   return (
     <header className="py-6 px-10 bg-gray-800 text-white flex items-center justify-between md:px-16">
-      <h1 className="text-2xl font-bold">
+      <h1 className="text-lg  font-bold smx:text-xl md:text-2xl">
         ACCOUNTS&<span className="text-amber-300">PARTNERS</span>
       </h1>
       <nav className="flex space-x-4">

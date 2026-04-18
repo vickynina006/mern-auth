@@ -176,7 +176,7 @@ export const sendResetOtp = async (req, res) => {
 export const resetPassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
   try {
-    if (!email || !password || !newPassword) {
+    if (!email || !otp || !newPassword) {
       return res.status(400).json({ message: "All fields are required" });
     }
     const user = await userModel.findOne({ email });
