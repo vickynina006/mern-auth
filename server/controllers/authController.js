@@ -2,6 +2,7 @@ import { userModel } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import transporter from "../config/nodemailer.js";
+import { generateOtp } from "../config/generateOtp.js";
 
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -91,7 +92,7 @@ export const sendVerifyOtp = async (req, res) => {
     if (user.isVerified) {
       return res.status(400).json({ message: "User already verified" });
     }
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const otp = generateOtp();
     user.verifyOtp = otp;
     user.verifyOtpExpiry = Date.now() + 10 * 60 * 1000;
     await user.save();
@@ -156,7 +157,7 @@ export const sendResetOtp = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const otp = generateOtp();
     user.resetOtp = otp;
     user.resetOtpExpiry = Date.now() + 10 * 60 * 1000;
     await user.save();
@@ -180,11 +181,14 @@ export const resetPassword = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
     const user = await userModel.findOne({ email });
-    if (user.resetOtp === "" || user.resetOtp !== otp) {
-      return res.status(400).json({ messsage: "Invalid OTP" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (!user.resetOtp || user.resetOtp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
     }
     if (user.resetOtpExpiry < Date.now()) {
-      return res.status(410).json({ messsage: "Expired OTP" });
+      return res.status(410).json({ message: "Expired OTP" });
     }
     const hashedpassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedpassword;
