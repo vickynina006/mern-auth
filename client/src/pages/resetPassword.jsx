@@ -3,6 +3,12 @@ import { useOtp } from "../utils/otpLogic";
 import api from "../axios-api/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  emailSchema,
+  newPasswordSchema,
+} from "../../../shared/validation/authSchema";
 
 const ResetPassword = () => {
   const [otp, setOtp] = useState("");
@@ -12,31 +18,49 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const schema = step === "email" ? emailSchema : newPasswordSchema;
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isSubmitting, isValid },
+    setError,
+  } = useForm({
+    resolver: zodResolver(schema),
+    mode: "onBlur",
+  });
+
   const { handleInput, handleKeyDown, inputRefs, handlePaste } = useOtp();
 
-  const handleEmailSubmit = async (e) => {
-    e.preventDefault();
-    if (loading) return;
+  const handleEmailSubmit = async (data) => {
+    if (isSubmitting) return;
 
-    setLoading(true);
     try {
-      const res = await api.post("/api/auth/send-reset-otp", { email });
+      const res = await api.post("/api/auth/send-reset-otp", {
+        email: data.email,
+      });
+
       if (res.status === 200) {
+        setEmail(data.email);
         toast.success(res.data.message);
         setStep("otp");
-      } else {
-        toast.error(res.data.message);
       }
-    } catch (error) {
-      toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      const backendError = err.response?.data?.errors;
+
+      if (backendError) {
+        backendError.forEach((error) => {
+          setError(error.field, { message: error.message });
+        });
+      } else {
+        toast.error(err.response?.data?.message || "Something went wrong");
+      }
     }
   };
 
   const handleOtpSubmit = (e) => {
     e.preventDefault();
-    if (loading) return;
+    if (isSubmitting) return;
 
     const otpArray = inputRefs.current.map((ref) => ref.value);
     const otpValue = otpArray.join("");
@@ -44,27 +68,30 @@ const ResetPassword = () => {
     setStep("newPassword");
   };
 
-  const handlePasswordReset = async (e) => {
-    e.preventDefault();
-    if (loading) return;
+  const handlePasswordReset = async (data) => {
+    if (isSubmitting) return;
 
-    setLoading(true);
     try {
       const res = await api.post("/api/auth/reset-password", {
         email,
         otp,
-        newPassword,
+        newPassword: data.newPassword,
       });
+
       if (res.status === 200) {
         toast.success(res.data.message);
         navigate("/login");
-      } else {
-        toast.error(res.data.message);
       }
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      const backendError = err.response?.data?.errors;
+
+      if (backendError) {
+        backendError.forEach((error) => {
+          setError(error.field, { message: error.message });
+        });
+      } else {
+        toast.error(err.response?.data?.message || "Something went wrong");
+      }
     }
   };
 
@@ -75,10 +102,11 @@ const ResetPassword = () => {
           title="Password Reset Email"
           description="Please enter your registered email id"
           name="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          onSubmit={handleEmailSubmit}
-          loading={loading}
+          placeholder="Email"
+          register={register}
+          errors={errors}
+          onSubmit={handleSubmit(handleEmailSubmit)}
+          isSubmitting={isSubmitting}
         />
       )}
 
@@ -116,11 +144,8 @@ const ResetPassword = () => {
               ))}
           </div>
 
-          <button
-            disabled={loading}
-            className="w-full py-1.5 px-8 rounded-full text-white bg-linear-to-r from-amber-500 to-amber-700 disabled:opacity-50"
-          >
-            {loading ? "Loading..." : "Verify OTP"}
+          <button className="w-full py-1.5 px-8 rounded-full text-white bg-linear-to-r from-amber-500 to-amber-700 disabled:opacity-50">
+            Verify OTP
           </button>
         </form>
       )}
@@ -130,11 +155,12 @@ const ResetPassword = () => {
           title="Password Reset"
           description="Please enter your new password"
           name="newPassword"
-          value={newPassword}
+          placeholder="New Password"
           type="password"
-          onChange={(e) => setNewPassword(e.target.value)}
-          onSubmit={handlePasswordReset}
-          loading={loading}
+          register={register}
+          errors={errors}
+          onSubmit={handleSubmit(handlePasswordReset)}
+          isSubmitting={isSubmitting}
         />
       )}
     </div>
@@ -147,11 +173,12 @@ export function PasswordResetForm({
   title,
   description,
   type = "text",
+  placeholder,
   name,
-  value,
-  onChange,
+  register,
+  errors,
   onSubmit,
-  loading,
+  isSubmitting,
 }) {
   return (
     <form
@@ -163,21 +190,24 @@ export function PasswordResetForm({
         <p className="text-center text-slate-300">{description}</p>
       </div>
 
-      <input
-        type={type}
-        placeholder={name}
-        value={value}
-        name={name}
-        onChange={onChange}
-        disabled={loading}
-        className="outline-none bg-slate-700 rounded-full w-full px-3 py-1 disabled:opacity-50"
-      />
+      <div className="w-full">
+        <input
+          type={type}
+          placeholder={placeholder}
+          {...register(name)}
+          className="outline-none bg-slate-700 rounded-full w-full px-3 py-1"
+        />
+
+        {errors?.[name] && (
+          <p className="text-red-400 text-sm mt-1">{errors[name].message}</p>
+        )}
+      </div>
 
       <button
-        disabled={loading}
-        className="w-full py-1.5 px-8 rounded-full text-white bg-linear-to-r from-amber-500 to-amber-700 disabled:opacity-50"
+        disabled={isSubmitting}
+        className="w-full py-1.5 px-8 rounded-full text-white bg-linear-to-r from-amber-500 to-amber-700"
       >
-        {loading ? "Loading..." : "Submit"}
+        {isSubmitting ? "Loading..." : "Submit"}
       </button>
     </form>
   );

@@ -4,38 +4,41 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { userContext } from "../context/userContext";
 import api from "../axios-api/axios";
+import {
+  loginSchema,
+  registerSchema,
+} from "../../../shared/validation/authSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 const Login = () => {
   const [isLogin, setIslogin] = useState("login");
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
+
+  const schema = isLogin === "login" ? loginSchema : registerSchema;
+  const {
+    handleSubmit,
+    register,
+    formState: { errors, isSubmitting, isValid },
+    setError,
+  } = useForm({
+    resolver: zodResolver(schema),
+    mode: "onBlur",
   });
+
   const { getUserData } = useContext(userContext);
   const navigate = useNavigate();
 
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // console.log(formData);
-  }
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
+  async function onSubmit(formData) {
     try {
       if (isLogin === "login") {
         const { email, password } = formData;
 
-        // console.log("loginData", email, password);
         const { data } = await api.post("/api/auth/login", {
           email,
           password,
         });
-        // console.log(data);
+
         getUserData();
-        // setIsAuthenticated(true);
         navigate("/");
 
         toast.success(data.message);
@@ -46,9 +49,15 @@ const Login = () => {
         toast.success(data.message);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something went wrong");
-    } finally {
-      setLoading(false);
+      const backendError = err.response?.data?.errors;
+
+      if (backendError) {
+        backendError.forEach((error) => {
+          setError(error.field, { message: error.message });
+        });
+      } else {
+        toast.error(err.response?.data?.message || "Something went wrong");
+      }
     }
   }
 
@@ -56,7 +65,7 @@ const Login = () => {
     <div className="min-h-screen bg-gray-400 flex justify-center px-2 smx:px-8 md:px-0">
       {" "}
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         className="p-8 rounded-lg h-fit mt-44 flex-col space-y-6 items-center bg-slate-900 md:mt-40 md:p-10 md:w-[45%] lg:w-[36%] xl:w-[27%]"
       >
         <div className="flex flex-col items-center gap-2">
@@ -70,35 +79,45 @@ const Login = () => {
           </p>
         </div>
 
-        {/* <form onSubmit={handleSubmit} className="gap-5 flex flex-col"> */}
         {isLogin !== "login" && (
+          <div>
+            <input
+              type="text"
+              placeholder="Name"
+              {...register("name")}
+              className="outline-none bg-slate-700 rounded-full w-full px-3 py-1"
+            />
+            {errors.name && (
+              <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>
+            )}
+          </div>
+        )}
+        <div>
+          {" "}
           <input
             type="text"
-            placeholder="Name"
-            value={formData.name}
-            name="name"
-            onChange={handleChange}
+            placeholder="email"
+            {...register("email")}
             className="outline-none bg-slate-700 rounded-full w-full px-3 py-1"
           />
-        )}
-        <input
-          type="text"
-          placeholder="email"
-          value={formData.email}
-          name="email"
-          onChange={handleChange}
-          className="outline-none bg-slate-700 rounded-full w-full px-3 py-1"
-        />
+          {errors.email && (
+            <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
+          )}
+        </div>
+
         <div>
           {" "}
           <input
             type="password"
             placeholder="password"
-            value={formData.password}
-            name="password"
-            onChange={handleChange}
+            {...register("password")}
             className="outline-none bg-slate-700 rounded-full w-full px-3 py-1"
           />
+          {errors.password && (
+            <p className="text-red-400 text-sm mt-1">
+              {errors.password.message}
+            </p>
+          )}
           {isLogin === "login" && (
             <Link to="/reset-password" className="text-sm text-amber-500 ">
               forgot password?
@@ -108,15 +127,22 @@ const Login = () => {
 
         <div className="flex flex-col gap-2 ">
           {" "}
-          <button className="bg-linear-to-r w-full from-amber-500 to-amber-700 text-white py-1.5 px-8 rounded-full">
-            {loading
+          <button
+            className={`hover:bg-amber-600 bg-linear-to-r w-full from-amber-500 to-amber-700 text-white py-1.5 px-8 rounded-full ${
+              isSubmitting || !isValid
+                ? "cursor-not-allowed "
+                : " cursor-pointer"
+            }`}
+            disabled={!isValid || isSubmitting}
+          >
+            {isSubmitting
               ? "Loading..."
               : isLogin === "login"
                 ? "Login"
                 : "Register"}
           </button>
         </div>
-        {/* </form> */}
+
         <div className="flex gap-2 justify-center">
           <p className="text-sm">
             {isLogin === "login"

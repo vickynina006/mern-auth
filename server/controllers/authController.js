@@ -5,11 +5,8 @@ import transporter from "../config/nodemailer.js";
 import { generateOtp } from "../config/generateOtp.js";
 
 export const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password } = req.validatedBody;
   try {
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
     const existingUser = await userModel.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
@@ -48,11 +45,8 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.validatedBody;
   try {
-    if (!email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
     const user = await userModel.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
@@ -121,12 +115,13 @@ export const verifyEmail = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    if (user.verifyOtp === "" || user.verifyOtp !== otp) {
-      return res.status(400).json({ messsage: "Invalid OTP" });
-    }
     if (user.verifyOtpExpiry < Date.now()) {
       return res.status(410).json({ messsage: "Expired OTP" });
     }
+    if (user.verifyOtp === "" || user.verifyOtp !== otp) {
+      return res.status(400).json({ messsage: "Invalid OTP" });
+    }
+
     user.isVerified = true;
     user.verifyOtp = "";
     user.verifyOtpExpiry = 0;
@@ -148,11 +143,8 @@ export const isAuthenticated = async (req, res) => {
 };
 
 export const sendResetOtp = async (req, res) => {
-  const { email } = req.body;
+  const { email } = req.validatedBody;
   try {
-    if (!email) {
-      return res.status(400).json({ message: "email is required" });
-    }
     const user = await userModel.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -175,11 +167,8 @@ export const sendResetOtp = async (req, res) => {
 };
 
 export const resetPassword = async (req, res) => {
-  const { email, otp, newPassword } = req.body;
+  const { email, otp, newPassword } = req.validatedBody;
   try {
-    if (!email || !otp || !newPassword) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
     const user = await userModel.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });

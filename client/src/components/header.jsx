@@ -6,7 +6,8 @@ import { toast } from "react-toastify";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, user, getUserData } = useContext(userContext);
+  const { isAuthenticated, user, setUser, getUserData } =
+    useContext(userContext);
   async function handleLogout() {
     try {
       await api.post("/api/auth/logout");
