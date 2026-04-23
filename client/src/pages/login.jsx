@@ -35,7 +35,7 @@ const Login = () => {
           password,
         });
 
-        getUserData();
+        await getUserData();
         navigate("/");
 
         toast.success(data.message);
