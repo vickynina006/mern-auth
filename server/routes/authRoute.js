@@ -16,7 +16,7 @@ import {
   registerSchema,
   emailSchema,
   resetPasswordSchema,
-} from "../../shared/validation/authSchema.js";
+} from "../validation/authSchema.js";
 
 const authRouter = express.Router();
 
