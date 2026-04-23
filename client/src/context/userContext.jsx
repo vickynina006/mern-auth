@@ -17,6 +17,7 @@ const UserProvider = ({ children }) => {
       return res.data.message;
     } catch (err) {
       console.log("error getting user data:", err.message);
+      setUser(null);
     }
   }
   useEffect(() => {
