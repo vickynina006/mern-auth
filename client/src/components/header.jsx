@@ -45,7 +45,7 @@ const Header = () => {
           {isAuthenticated ? (
             <div className="relative group flex gap-4">
               <span className="h-10 w-10 flex justify-center items-center rounded-full bg-amber-500">
-                {user?.name[0].toUpperCase()}
+                {user?.name[0]?.toUpperCase()}
               </span>
               <ul className="flex-col gap-4 hidden group-hover:flex absolute top-10 right-0 bg-gray-800 p-4 rounded">
                 <li onClick={handleLogout} className="cursor-pointer">
@@ -91,7 +91,7 @@ const Header = () => {
                 <>
                   <li className="flex items-center gap-2">
                     <span className="h-10 w-10 flex justify-center items-center rounded-full bg-amber-500">
-                      {user?.name[0].toUpperCase()}
+                      {user?.name[0]?.toUpperCase()}
                     </span>
                     <span>{user?.name}</span>
                   </li>
