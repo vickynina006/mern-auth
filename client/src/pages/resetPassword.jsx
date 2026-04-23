@@ -5,10 +5,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  emailSchema,
-  newPasswordSchema,
-} from "../../../shared/validation/authSchema";
+import { emailSchema, newPasswordSchema } from "../validation/authSchema";
 
 const ResetPassword = () => {
   const [otp, setOtp] = useState("");
@@ -27,7 +24,7 @@ const ResetPassword = () => {
     setError,
   } = useForm({
     resolver: zodResolver(schema),
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const { handleInput, handleKeyDown, inputRefs, handlePaste } = useOtp();

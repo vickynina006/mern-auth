@@ -4,10 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { userContext } from "../context/userContext";
 import api from "../axios-api/axios";
-import {
-  loginSchema,
-  registerSchema,
-} from "../../../shared/validation/authSchema";
+import { loginSchema, registerSchema } from "../validation/authSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -22,7 +19,7 @@ const Login = () => {
     setError,
   } = useForm({
     resolver: zodResolver(schema),
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const { getUserData } = useContext(userContext);
