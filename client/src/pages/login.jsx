@@ -19,7 +19,7 @@ const Login = () => {
     setError,
   } = useForm({
     resolver: zodResolver(schema),
-    mode: "onChange",
+    mode: "onTouched",
   });
 
   const { getUserData } = useContext(userContext);
@@ -35,7 +35,7 @@ const Login = () => {
           password,
         });
 
-        getUserData();
+        await getUserData();
         navigate("/");
 
         toast.success(data.message);
