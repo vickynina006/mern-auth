@@ -6,7 +6,7 @@ export const userContext = createContext();
 
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   async function getUserData() {
     try {
       const res = await api.get("/api/userdata");
@@ -23,21 +23,6 @@ const UserProvider = ({ children }) => {
   useEffect(() => {
     getUserData();
   }, []);
-  // useEffect(() => {
-  //   async function getAuthState() {
-  //     axios.defaults.withCredentials = true;
-  //     try {
-  //       await api.get("/api/auth/is-auth");
-  //       getUserData();
-  //       setIsAuthenticated(true);
-  //     } catch (err) {
-  //       setUser(null);
-  //       setIsAuthenticated(false);
-  //       console.log("error", err.response);
-  //     }
-  //   }
-  //   getAuthState();
-  // }, []);
 
   return (
     <userContext.Provider
