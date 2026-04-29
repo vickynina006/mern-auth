@@ -39,7 +39,7 @@ const Header = () => {
     <>
       <header className="py-6 px-4 bg-gray-800 text-white flex items-center justify-between smx:px-9 md:px-16 relative">
         <h1 className="text-lg font-bold sm:text-xl md:text-2xl">
-          ACCTS&<span className="text-amber-300">PARTNERS</span>
+          AUTHRA
         </h1>
         <nav className="hidden md:flex space-x-4">
           {isAuthenticated ? (
