@@ -4,6 +4,7 @@ import { userContext } from "../context/userContext";
 import api from "../axios-api/axios";
 import { toast } from "react-toastify";
 import { FaBars, FaTimes } from "react-icons/fa";
+import logo from "../assets/authra_logo.png";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -38,9 +39,7 @@ const Header = () => {
   return (
     <>
       <header className="py-6 px-4 bg-gray-800 text-white flex items-center justify-between smx:px-9 md:px-16 relative">
-        <h1 className="text-lg text-amber-400 font-bold sm:text-xl md:text-2xl">
-          AUTHRA
-        </h1>
+        <img className="h-9 w-28 md:h-12 md:w-36" src={logo} alt="AUTHRA" />
         <nav className="hidden md:flex space-x-4">
           {isAuthenticated ? (
             <div className="relative group flex gap-4">
