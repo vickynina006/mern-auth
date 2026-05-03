@@ -23,16 +23,16 @@ export const register = async (req, res) => {
     });
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
     const mailerOptions = {
       from: process.env.SENDER_EMAIL,
       to: email,
-      subject: "Welcome to Our Accounts and Partners",
-      text: `Hello ${name}, Welcome to Accounts and Partners. Your account has been successfully created.`,
+      subject: "Welcome to Authra",
+      text: `Hello ${name}, Welcome to Authra. Your account has been successfully created.`,
     };
     await transporter.sendMail(mailerOptions);
 
@@ -80,8 +80,8 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    secure: true,
+    sameSite: "none",
   });
   return res.status(200).json({ message: "Logout successful" });
 };
@@ -123,10 +123,10 @@ export const verifyEmail = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     if (user.verifyOtpExpiry < Date.now()) {
-      return res.status(410).json({ messsage: "Expired OTP" });
+      return res.status(410).json({ message: "Expired OTP" });
     }
     if (user.verifyOtp === "" || user.verifyOtp !== otp) {
-      return res.status(400).json({ messsage: "Invalid OTP" });
+      return res.status(400).json({ message: "Invalid OTP" });
     }
 
     user.isVerified = true;
