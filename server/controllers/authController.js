@@ -23,22 +23,33 @@ export const register = async (req, res) => {
     });
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    const mailerOptions = {
-      from: process.env.SENDER_EMAIL,
-      to: email,
-      subject: "Welcome to Authra",
-      text: `Hello ${name}, Welcome to Authra. Your account has been successfully created.`,
-    };
-    await transporter.sendMail(mailerOptions);
+    // const mailerOptions = {
+    //   from: process.env.SENDER_EMAIL,
+    //   to: email,
+    //   subject: "Welcome to Authra",
+    //   text: `Hello ${name}, Welcome to Authra. Your account has been successfully created.`,
+    // };
+    // await transporter.sendMail(mailerOptions);
 
     res
       .status(201)
       .json({ message: "User registered successfully", user: newUser });
+
+    transporter
+      .sendMail({
+        from: process.env.SENDER_EMAIL,
+        to: email,
+        subject: "Welcome to Authra",
+        text: `Hello ${name}, Welcome to Authra. Your account has been successfully created.`,
+      })
+      .catch((err) => {
+        console.error("Email error:", err.message);
+      });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -66,11 +77,18 @@ export const login = async (req, res) => {
     // });
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: 24 * 60 * 60 * 1000,
     });
-
+    // const {
+    //   password,
+    //   resetOtp,
+    //   resetOtpExpiry,
+    //   verifyOtp,
+    //   verifyOtpExpiry,
+    //   ...userData
+    // } = user.toObject();
     return res.status(200).json({ message: "Login successful", user });
   } catch (err) {
     return res.status(500).json({ message: err.message });
