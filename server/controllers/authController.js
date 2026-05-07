@@ -24,7 +24,7 @@ export const register = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
-      sameSite: "none" ,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -115,14 +115,15 @@ export const sendVerifyOtp = async (req, res) => {
     user.verifyOtp = otp;
     user.verifyOtpExpiry = Date.now() + 10 * 60 * 1000;
     await user.save();
+
+    return res.status(200).json({ message: "OTP sent successfully" });
     const mailOptions = {
       from: process.env.SENDER_EMAIL,
       to: user.email,
       subject: "Verify Your Email",
       text: `Your verification OTP is ${otp}`,
     };
-    await transporter.sendMail(mailOptions);
-    return res.status(200).json({ message: "OTP sent successfully" });
+    transporter.sendMail(mailOptions);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
